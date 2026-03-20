@@ -22,7 +22,10 @@ class BrusnikaAdapter:
 
     def _api_key(self, payload: Dict[str, Any]) -> str:
         override = payload.get("_provider_auth")
-        return override or settings.BRUSNIKA_API_KEY
+        if override:
+            return override
+        # BRUSNIKA_API_KEY might not be configured if provider is not in use
+        return getattr(settings, "BRUSNIKA_API_KEY", "")
 
     @retry_policy()
     async def _post(self, path: str, json_payload: Dict[str, Any], api_key: str) -> httpx.Response:
